@@ -8,7 +8,5 @@ import org.apache.zookeeper.ZooKeeper;
  * @date 2021/3/8 18:40
  */
 public class ZooClient {
-    public static void main(String[] args) {
 
-    }
 }
