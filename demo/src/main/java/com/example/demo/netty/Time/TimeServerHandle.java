@@ -1,6 +1,7 @@
 package com.example.demo.netty.Time;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
@@ -12,25 +13,29 @@ import io.netty.util.ReferenceCountUtil;
  */
 public class TimeServerHandle extends ChannelInboundHandlerAdapter {
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ByteBuf response = Unpooled.copiedBuffer("hello".getBytes());
+        ctx.writeAndFlush(response);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+        ctx.close();
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf in = (ByteBuf) msg;
-        try {
-            while (in.isReadable()) { // (1)
-                System.out.print((char) in.readByte());
-                System.out.flush();
-            }
-        } finally {
-            ReferenceCountUtil.release(msg); // (2)
-        }
+        byte[] req = new byte[in.readableBytes()];
+        in.readBytes(req);
+        String body = new String(req, "UTF-8");
+        System.out.print(body);
+        ByteBuf resp = Unpooled.copiedBuffer("hello".getBytes());
+        ctx.write(resp);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.flush();
     }
 }
