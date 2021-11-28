@@ -32,6 +32,6 @@ public class FixedCapacityStackOfStrings {
     }
 
     boolean isFull() {
-        return current == cap - 1;
+        return current == cap ;
     }
 }
